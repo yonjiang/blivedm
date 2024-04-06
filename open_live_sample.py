@@ -49,6 +49,7 @@ class MyHandler(blivedm.BaseHandler):
     def _on_open_live_danmaku(self, client: blivedm.OpenLiveClient, message: open_models.DanmakuMessage):
         print(f'[{message.room_id}] {message.uname}：{message.msg}')
 
+
     def _on_open_live_gift(self, client: blivedm.OpenLiveClient, message: open_models.GiftMessage):
         coin_type = '金瓜子' if message.paid else '银瓜子'
         total_coin = message.price * message.gift_num
