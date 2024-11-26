@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "PythonUnreal",
+			"Path": "..\\Source\\PythonUnreal.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "PythonUnrealEditor",
+			"Path": "..\\Source\\PythonUnrealEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
