@@ -10,6 +10,9 @@
 #include "Sockets.h"
 #include "SocketSubsystem.h"
 #include "Interfaces/IPv4/IPv4Endpoint.h"
+#include "Web/DataParser.h"
+
+
 PRAGMA_DISABLE_OPTIMIZATION
 // Sets default values
 AMyClient::AMyClient()
@@ -48,12 +51,6 @@ void AMyClient::ConnectToPython()
 	
 	int32 NewSize = 0;
 	Socket->SetReceiveBufferSize(2 * 1024 * 1024, NewSize);
-}
-
-float AMyClient::ntohf(uint32 netfloat)
-{
-	uint32 hostfloat = ntohl(netfloat);
-	return *(float*)&hostfloat;
 }
 
 // void AMyClient::ReceiveData()
@@ -98,113 +95,162 @@ float AMyClient::ntohf(uint32 netfloat)
 // 	}
 // }
 
+// void AMyClient::ReceiveData()
+// {
+//     if (!Socket) return;
+//
+//     TArray<uint8> ReceivedData;
+//     uint32 Size;
+//     while (Socket->HasPendingData(Size))
+//     {
+//         ReceivedData.SetNumUninitialized(FMath::Min(Size, 65507u));
+//
+//         int32 Read = 0;
+//         Socket->Recv(ReceivedData.GetData(), ReceivedData.Num(), Read);
+//
+//         if (Read > 0)
+//         {
+//             const uint8* DataPtr = ReceivedData.GetData();
+//             const uint8* DataEnd = DataPtr + Read;
+//
+//             int32 Integer;
+//             float Floating;
+//             uint32 StringLength;
+//             bool Boolean;
+//             uint8 ByteArray[4];
+//
+//             // 解析整数
+//             if (DataPtr + sizeof(int32) <= DataEnd)
+//             {
+//                 FMemory::Memcpy(&Integer, DataPtr, sizeof(int32));
+//                 Integer = ntohl(Integer); // 转换为主机字节序
+//                 DataPtr += sizeof(int32);
+//             }
+//             else
+//             {
+//                 UE_LOG(LogTemp, Error, TEXT("Failed to parse Integer"));
+//                 continue;
+//             }
+//
+//             // 解析浮点数
+//             if (DataPtr + sizeof(float) <= DataEnd)
+//             {
+//                 uint32 NetFloat;
+//                 FMemory::Memcpy(&NetFloat, DataPtr, sizeof(uint32));
+//                 Floating = ntohf(NetFloat); // 转换为主机字节序
+//                 DataPtr += sizeof(uint32);
+//             }
+//             else
+//             {
+//                 UE_LOG(LogTemp, Error, TEXT("Failed to parse Floating"));
+//                 continue;
+//             }
+//
+//             // 解析字符串长度
+//             if (DataPtr + sizeof(uint32) <= DataEnd)
+//             {
+//                 FMemory::Memcpy(&StringLength, DataPtr, sizeof(uint32));
+//                 StringLength = ntohl(StringLength); // 转换为主机字节序
+//                 DataPtr += sizeof(uint32);
+//             }
+//             else
+//             {
+//                 UE_LOG(LogTemp, Error, TEXT("Failed to parse StringLength"));
+//                 continue;
+//             }
+//
+//             // 解析字符串
+//             FString String;
+//             if (StringLength > 0 && DataPtr + StringLength <= DataEnd)
+//             {
+//                 // 使用 FUTF8ToTCHAR 将 UTF-8 编码的字节数组转换为 FString
+//                 String = FString(FUTF8ToTCHAR((const ANSICHAR*)DataPtr, StringLength));
+//                 DataPtr += StringLength;
+//             }
+//             else if (StringLength > 0)
+//             {
+//                 UE_LOG(LogTemp, Error, TEXT("Failed to parse String"));
+//                 continue;
+//             }
+//
+//             // 解析布尔值
+//             if (DataPtr + sizeof(bool) <= DataEnd)
+//             {
+//                 FMemory::Memcpy(&Boolean, DataPtr, sizeof(bool));
+//                 DataPtr += sizeof(bool);
+//             }
+//             else
+//             {
+//                 UE_LOG(LogTemp, Error, TEXT("Failed to parse Boolean"));
+//                 continue;
+//             }
+//
+//             // 解析字节数组
+//             if (DataPtr + sizeof(ByteArray) <= DataEnd)
+//             {
+//                 FMemory::Memcpy(ByteArray, DataPtr, sizeof(ByteArray));
+//             }
+//             else
+//             {
+//                 UE_LOG(LogTemp, Error, TEXT("Failed to parse ByteArray"));
+//                 continue;
+//             }
+//
+//             // 打印接收到的数据
+//             UE_LOG(LogTemp, Log, TEXT("Received data: %d, %f, %s, %s, %02x%02x%02x%02x"),
+//                 Integer, Floating, *String, Boolean ? TEXT("true") : TEXT("false"),
+//                 ByteArray[0], ByteArray[1], ByteArray[2], ByteArray[3]);
+//         }
+//     }
+// }
+
 void AMyClient::ReceiveData()
 {
-    if (!Socket) return;
+	if (!Socket) return;
 
-    TArray<uint8> ReceivedData;
-    uint32 Size;
-    while (Socket->HasPendingData(Size))
-    {
-        ReceivedData.SetNumUninitialized(FMath::Min(Size, 65507u));
+	TArray<uint8> ReceivedData;
+	uint32 Size;
+	while (Socket->HasPendingData(Size))
+	{
+		ReceivedData.SetNumUninitialized(FMath::Min(Size, 65507u));
 
-        int32 Read = 0;
-        Socket->Recv(ReceivedData.GetData(), ReceivedData.Num(), Read);
+		int32 Read = 0;
+		Socket->Recv(ReceivedData.GetData(), ReceivedData.Num(), Read);
 
-        if (Read > 0)
-        {
-            const uint8* DataPtr = ReceivedData.GetData();
-            const uint8* DataEnd = DataPtr + Read;
+		if (Read > 0)
+		{
+			const uint8* DataPtr = ReceivedData.GetData();
+			const uint8* DataEnd = DataPtr + Read;
 
-            int32 Integer;
-            float Floating;
-            uint32 StringLength;
-            bool Boolean;
-            uint8 ByteArray[4];
+			IntegerParser IntParser;
+			FloatParser FloatParser;
+			StringParser StrParser;
+			BooleanParser BoolParser;
+			ByteArrayParser BytesParser;
 
-            // 解析整数
-            if (DataPtr + sizeof(int32) <= DataEnd)
-            {
-                FMemory::Memcpy(&Integer, DataPtr, sizeof(int32));
-                Integer = ntohl(Integer); // 转换为主机字节序
-                DataPtr += sizeof(int32);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to parse Integer"));
-                continue;
-            }
-
-            // 解析浮点数
-            if (DataPtr + sizeof(float) <= DataEnd)
-            {
-                uint32 NetFloat;
-                FMemory::Memcpy(&NetFloat, DataPtr, sizeof(uint32));
-                Floating = ntohf(NetFloat); // 转换为主机字节序
-                DataPtr += sizeof(uint32);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to parse Floating"));
-                continue;
-            }
-
-            // 解析字符串长度
-            if (DataPtr + sizeof(uint32) <= DataEnd)
-            {
-                FMemory::Memcpy(&StringLength, DataPtr, sizeof(uint32));
-                StringLength = ntohl(StringLength); // 转换为主机字节序
-                DataPtr += sizeof(uint32);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to parse StringLength"));
-                continue;
-            }
-
-            // 解析字符串
-            FString String;
-            if (StringLength > 0 && DataPtr + StringLength <= DataEnd)
-            {
-                // 使用 FUTF8ToTCHAR 将 UTF-8 编码的字节数组转换为 FString
-                String = FString(FUTF8ToTCHAR((const ANSICHAR*)DataPtr, StringLength));
-                DataPtr += StringLength;
-            }
-            else if (StringLength > 0)
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to parse String"));
-                continue;
-            }
-
-            // 解析布尔值
-            if (DataPtr + sizeof(bool) <= DataEnd)
-            {
-                FMemory::Memcpy(&Boolean, DataPtr, sizeof(bool));
-                DataPtr += sizeof(bool);
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to parse Boolean"));
-                continue;
-            }
-
-            // 解析字节数组
-            if (DataPtr + sizeof(ByteArray) <= DataEnd)
-            {
-                FMemory::Memcpy(ByteArray, DataPtr, sizeof(ByteArray));
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to parse ByteArray"));
-                continue;
-            }
-
-            // 打印接收到的数据
-            UE_LOG(LogTemp, Log, TEXT("Received data: %d, %f, %s, %s, %02x%02x%02x%02x"),
-                Integer, Floating, *String, Boolean ? TEXT("true") : TEXT("false"),
-                ByteArray[0], ByteArray[1], ByteArray[2], ByteArray[3]);
-        }
-    }
+			// 解析数据
+			if (IntParser.Parse(DataPtr, DataEnd) &&
+				FloatParser.Parse(DataPtr, DataEnd) &&
+				StrParser.Parse(DataPtr, DataEnd) &&
+				BoolParser.Parse(DataPtr, DataEnd)&&
+				BytesParser.Parse(DataPtr, DataEnd)
+				)
+			{
+				// 打印接收到的数据
+				UE_LOG(LogTemp, Log, TEXT("Received data: %d, %f, %s, %s, %02x%02x%02x%02x"),
+					IntParser.Value, FloatParser.Value, *StrParser.Value,
+					BoolParser.Value ? TEXT("true") : TEXT("false"),
+                    BytesParser.ByteArray[0],
+                    BytesParser.ByteArray[1],
+                    BytesParser.ByteArray[2],
+                    BytesParser.ByteArray[3]);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Failed to parse data"));
+			}
+		}
+	}
 }
 
 PRAGMA_ENABLE_OPTIMIZATION

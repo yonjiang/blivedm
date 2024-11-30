@@ -26,7 +26,6 @@ public:
 
 private:
 	void ConnectToPython();
-	float ntohf(uint32 netfloat);
 	void ReceiveData();
 
 	FSocket* Socket;

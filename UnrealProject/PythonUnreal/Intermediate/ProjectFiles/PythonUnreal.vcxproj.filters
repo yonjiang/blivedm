@@ -12,6 +12,7 @@
       <Filter>Source</Filter>
     </None>
     <None Include="..\..\.vsconfig" />
+    <None Include="..\..\PythonUnreal.sln.DotSettings.user" />
     <Filter Include="Config">
       <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
     </Filter>
@@ -33,6 +34,12 @@
     <Filter Include="Source\PythonUnreal">
       <UniqueIdentifier>{437CD97D-7F63-3542-8E95-0B834B511D6B}</UniqueIdentifier>
     </Filter>
+    <ClCompile Include="..\..\Source\PythonUnreal\LensFlareManager.cpp">
+      <Filter>Source\PythonUnreal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PythonUnreal\LensFlareManager.h">
+      <Filter>Source\PythonUnreal</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\Source\PythonUnreal\MyClient.cpp">
       <Filter>Source\PythonUnreal</Filter>
     </ClCompile>
@@ -65,6 +72,15 @@
     </ClCompile>
     <ClCompile Include="..\..\Source\PythonUnreal\PythonUnrealPlayerController.h">
       <Filter>Source\PythonUnreal</Filter>
+    </ClCompile>
+    <Filter Include="Source\PythonUnreal\Web">
+      <UniqueIdentifier>{E4F59F22-4BAE-3CF1-BA13-207D6C949698}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\PythonUnreal\Web\DataParser.cpp">
+      <Filter>Source\PythonUnreal\Web</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\PythonUnreal\Web\DataParser.h">
+      <Filter>Source\PythonUnreal\Web</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
