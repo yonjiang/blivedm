@@ -253,4 +253,91 @@ void AMyClient::ReceiveData()
 	}
 }
 
+// void AMyClient::ReceiveData()
+// {
+//     if (!Socket) return;
+
+//     TArray<uint8> ReceivedData;
+//     uint32 Size;
+//     while (Socket->HasPendingData(Size))
+//     {
+//         ReceivedData.SetNumUninitialized(FMath::Min(Size, 65507u));
+
+//         int32 Read = 0;
+//         Socket->Recv(ReceivedData.GetData(), ReceivedData.Num(), Read);
+
+//         if (Read > 0)
+//         {
+//             const uint8* DataPtr = ReceivedData.GetData();
+//             const uint8* DataEnd = DataPtr + Read;
+//             FString MessageString;
+//             while (DataPtr < DataEnd)
+//             {
+//                 // 假设消息以字符串形式发送，首先解析消息字符串
+//                 FString MessagePart = UTF8_TO_TCHAR(reinterpret_cast<const char*>(DataPtr));
+//                 MessageString += MessagePart;
+//                 DataPtr += MessagePart.Len() + 1; // 移动指针到下一个消息
+//             }
+
+//             // 根据消息类型处理
+//             if (MessageString.StartsWith(TEXT("heartbeat ")))
+//             {
+//                 HandleHeartbeat(MessageString);
+//             }
+//             else if (MessageString.StartsWith(TEXT("danmaku ")))
+//             {
+//                 HandleDanmaku(MessageString);
+//             }
+//             else if (MessageString.StartsWith(TEXT("gift ")))
+//             {
+//                 HandleGift(MessageString);
+//             }
+//             else if (MessageString.StartsWith(TEXT("buy_guard ")))
+//             {
+//                 HandleBuyGuard(MessageString);
+//             }
+//             else if (MessageString.StartsWith(TEXT("super_chat ")))
+//             {
+//                 HandleSuperChat(MessageString);
+//             }
+//             else
+//             {
+//                 UE_LOG(LogTemp, Error, TEXT("Unknown message type: %s"), *MessageString);
+//             }
+//         }
+//     }
+// }
+
+// void AMyClient::HandleHeartbeat(const FString& Message)
+// {
+//     // 解析并处理心跳消息
+//     UE_LOG(LogTemp, Log, TEXT("Heartbeat received: %s"), *Message);
+// }
+
+// void AMyClient::HandleDanmaku(const FString& Message)
+// {
+//     // 解析并处理弹幕消息
+//     UE_LOG(LogTemp, Log, TEXT("Danmaku received: %s"), *Message);
+// }
+
+// void AMyClient::HandleGift(const FString& Message)
+// {
+//     // 解析并处理礼物消息
+//     UE_LOG(LogTemp, Log, TEXT("Gift received: %s"), *Message);
+// }
+
+// void AMyClient::HandleBuyGuard(const FString& Message)
+// {
+//     // 解析并处理购买守护消息
+//     UE_LOG(LogTemp, Log, TEXT("Buy guard received: %s"), *Message);
+// }
+
+// void AMyClient::HandleSuperChat(const FString& Message)
+// {
+//     // 解析并处理超级聊天消息
+//     UE_LOG(LogTemp, Log, TEXT("Super chat received: %s"), *Message);
+// }
+
+
+
 PRAGMA_ENABLE_OPTIMIZATION
