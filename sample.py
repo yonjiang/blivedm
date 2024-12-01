@@ -9,6 +9,7 @@ import aiohttp
 import blivedm
 import blivedm.models.web as web_models
 
+
 # 直播间ID的取值看直播间URL
 TEST_ROOM_IDS = [
     23438368,
