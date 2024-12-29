@@ -8,6 +8,7 @@ import aiohttp
 
 import blivedm
 import blivedm.models.web as web_models
+import blivedm.unreal_handlers as handlers
 
 
 # 直播间ID的取值看直播间URL
@@ -46,7 +47,8 @@ async def run_single_client():
     """
     room_id = random.choice(TEST_ROOM_IDS)
     client = blivedm.BLiveClient(room_id, session=session)
-    handler = MyHandler()
+    # handler = MyHandler()
+    handler = handlers.UnrealHandler()
     client.set_handler(handler)
 
     client.start()
@@ -65,7 +67,8 @@ async def run_multi_clients():
     演示同时监听多个直播间
     """
     clients = [blivedm.BLiveClient(room_id, session=session) for room_id in TEST_ROOM_IDS]
-    handler = MyHandler()
+    # handler = MyHandler()
+    handler = handlers.UnrealHandler()
     for client in clients:
         client.set_handler(handler)
         client.start()

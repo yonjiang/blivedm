@@ -45,3 +45,5 @@ class UnrealHandler(blivedm.BaseHandler):
     def _on_super_chat(self, client: blivedm.BLiveClient, message: web_models.SuperChatMessage):
         print(f'[{client.room_id}] 醒目留言 ¥{message.price} {message.uname}：{message.message}')
         self._send_data(f'super_chat {client.room_id} {message.price} {message.uname} {message.message}')
+
+
